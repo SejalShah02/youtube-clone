@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Clone</title>
+    <style>
+        :root {
+            --primary-color: #ff0000;
+            --secondary-color: #282828;
+            --text-color: #030303;
+            --light-text: #606060;
+            --background: #f9f9f9;
+            --white: #ffffff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: var(--background);
+            color: var(--text-color);
+        }
+        
+        /* Header Styles */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: var(--white);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo-icon {
+            color: var(--primary-color);
+            font-size: 2rem;
+            margin-right: 10px;
+        }
+        
+        .logo-text {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        
+        .search-bar {
+            display: flex;
+            flex: 0.6;
+            max-width: 600px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 20px 0 0 20px;
+            font-size: 1rem;
+        }
+        
+        .search-btn {
+            padding: 10px 20px;
+            background-color: #f8f8f8;
+            border: 1px solid #ccc;
+            border-left: none;
+            border-radius: 0 20px 20px 0;
+            cursor: pointer;
+        }
+        
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .user-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        /* Main Content */
+        .container {
+            display: flex;
+        }
+        
+        /* Sidebar */
+        aside {
+            width: 240px;
+            padding: 20px 0;
+            background-color: var(--white);
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+            position: sticky;
+            top: 60px;
+        }
+        
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 25px;
+            cursor: pointer;
+        }
+        
+        .sidebar-item:hover {
+            background-color: #f2f2f2;
+        }
+        
+        .sidebar-item.active {
+            background-color: #e5e5e5;
+        }
+        
+        .sidebar-item i {
+            margin-right: 20px;
+            font-size: 1.2rem;
+        }
+        
+        /* Videos Section */
+        main {
+            flex: 1;
+            padding: 20px;
+        }
+        
+        .categories {
+            display: flex;
+            gap: 10px;
+            padding: 10px 0;
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+        
+        .category-chip {
+            padding: 8px 12px;
+            background-color: #e5e5e5;
+            border-radius: 16px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        
+        .category-chip.active {
+            background-color: var(--secondary-color);
+            color: var(--white);
+        }
+        
+        .videos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .video-card {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .video-card:hover {
+            transform: scale(1.02);
+        }
+        
+        .thumbnail {
+            position: relative;
+            margin-bottom: 10px;
+        }
+        
+        .thumbnail img {
+            width: 100%;
+            border-radius: 12px;
+        }
+        
+        .duration {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: var(--white);
+            padding: 3px 5px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        
+        .video-info {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .channel-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: #ccc;
+        }
+        
+        .video-details h3 {
+            font-size: 1rem;
+            margin-bottom: 6px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .video-details p {
+            color: var(--light-text);
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            aside {
+                width: 100%;
+                height: auto;
+                position: static;
+            }
+            
+            .search-bar {
+                flex: 1;
+                margin: 0 10px;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <i class="material-icons logo-icon">play_circle_filled</i>
+            <span class="logo-text">YouTube</span>
+        </div>
+        
+        <div class="search-bar">
+            <input type="text" class="search-input" placeholder="Search">
+            <button class="search-btn">
+                <i class="material-icons">search</i>
+            </button>
+        </div>
+        
+        <div class="user-actions">
+            <i class="material-icons">videocam</i>
+            <i class="material-icons">apps</i>
+            <i class="material-icons">notifications</i>
+            <div class="user-icon">U</div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <aside>
+            <div class="sidebar-item active">
+                <i class="material-icons">home</i>
+                <span>Home</span>
+            </div>
+            <div class="sidebar-item">
+                <i class="material-icons">explore</i>
+                <span>Explore</span>
+            </div>
+            <div class="sidebar-item">
+                <i class="material-icons">subscriptions</i>
+                <span>Subscriptions</span>
+            </div>
+            <hr>
+            <div class="sidebar-item">
+                <i class="material-icons">video_library</i>
+                <span>Library</span>
+            </div>
+            <div class="sidebar-item">
+                <i class="material-icons">history</i>
+                <span>History</span>
+            </div>
+            <div class="sidebar-item">
+                <i class="material-icons">slideshow</i>
+                <span>Your videos</span>
+            </div>
+            <div class="sidebar-item">
+                <i class="material-icons">watch_later</i>
+                <span>Watch later</span>
+            </div>
+            <div class="sidebar-item">
+                <i class="material-icons">thumb_up</i>
+                <span>Liked videos</span>
+            </div>
+            <hr>
+            <h4 style="padding: 10px 25px;">Subscriptions</h4>
+            <div class="sidebar-item">
+                <div class="channel-icon"></div>
+                <span>Tech Channel</span>
+            </div>
+            <div class="sidebar-item">
+                <div class="channel-icon"></div>
+                <span>Music Channel</span>
+            </div>
+            <div class="sidebar-item">
+                <div class="channel-icon"></div>
+                <span>Gaming Channel</span>
+            </div>
+        </aside>
+        
+        <main>
+            <div class="categories">
+                <div class="category-chip active">All</div>
+                <div class="category-chip">Music</div>
+                <div class="category-chip">Gaming</div>
+                <div class="category-chip">Live</div>
+                <div class="category-chip">Computer Science</div>
+                <div class="category-chip">Cooking</div>
+                <div class="category-chip">Recently uploaded</div>
+                <div class="category-chip">Watched</div>
+            </div>
+            
+            <div class="videos-grid">
+                <!-- Video Card 1 -->
+                <div class="video-card">
+                    <div class="thumbnail">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/89ef9c5d-e1da-421c-86a8-606eab0d0353.png" alt="Modern tech tutorial showing coding on a laptop with colorful syntax highlighting">
+                        <span class="duration">12:34</span>
+                    </div>
+                    <div class="video-info">
+                        <div class="channel-icon"></div>
+                        <div class="video-details">
+                            <h3>How to build a YouTube clone with HTML and CSS - Full Tutorial</h3>
+                            <p>Tech Channel</p>
+                            <p>1.2M views • 2 weeks ago</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Video Card 2 -->
+                <div class="video-card">
+                    <div class="thumbnail">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/435308b9-7ff0-4e3f-b001-90166ae7b16c.png" alt="Chef preparing a gourmet pasta dish in a professional kitchen with fresh ingredients">
+                        <span class="duration">18:45</span>
+                    </div>
+                    <div class="video-info">
+                        <div class="channel-icon"></div>
+                        <div class="video-details">
+                            <h3>5 Easy Pasta Recipes Anyone Can Make - Cooking Tutorial</h3>
+                            <p>Cooking Channel</p>
+                            <p>850K views • 1 month ago</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Video Card 3 -->
+                <div class="video-card">
+                    <div class="thumbnail">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/7f8385eb-c3b9-4c84-a029-923a244d78bc.png" alt="Gameplay footage of popular action game with high quality graphics and special effects">
+                        <span class="duration">25:01</span>
+                    </div>
+                    <div class="video-info">
+                        <div class="channel-icon"></div>
+                        <div class="video-details">
+                            <h3>New Game Review - Full Walkthrough and Analysis</h3>
+                            <p>Gaming Channel</p>
+                            <p>3.4M views • 3 days ago</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Video Card 4 -->
+                <div class="video-card">
+                    <div class="thumbnail">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/d99a115d-277c-457d-b269-b565e304057b.png" alt="Music studio setup with keyboard, microphone, and audio equipment for production">
+                        <span class="duration">8:22</span>
+                    </div>
+                    <div class="video-info">
+                        <div class="channel-icon"></div>
+                        <div class="video-details">
+                            <h3>How to Make Beats - Music Production Tutorial</h3>
+                            <p>Music Channel</p>
+                            <p>560K views • 2 months ago</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Video Card 5 -->
+                <div class="video-card">
+                    <div class="thumbnail">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/fcd74f85-919e-4b63-8f68-d0a1129f082a.png" alt="Travel vlog showing beautiful beach with clear blue water and palm trees">
+                        <span class="duration">15:30</span>
+                    </div>
+                    <div class="video-info">
+                        <div class="channel-icon"></div>
+                        <div class="video-details">
+                            <h3>Top 10 Beaches You Must Visit - Travel Guide</h3>
+                            <p>Travel Channel</p>
+                            <p>2.1M views • 5 days ago</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Video Card 6 -->
+                <div class="video-card">
+                    <div class="thumbnail">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/a56be0b7-4593-4eed-80d8-9c01f8d106f0.png" alt="Fitness trainer demonstrating proper form for weight lifting exercises">
+                        <span class="duration">12:10</span>
+                    </div>
+                    <div class="video-info">
+                        <div class="channel-icon"></div>
+                        <div class="video-details">
+                            <h3>Beginner's Guide to Strength Training - Full Workout</h3>
+                            <p>Fitness Channel</p>
+                            <p>720K views • 3 weeks ago</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        // Simple interactivity for the UI
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle active state for categories
+            const categories = document.querySelectorAll('.category-chip');
+            categories.forEach(category => {
+                category.addEventListener('click', function() {
+                    categories.forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // Toggle active state for sidebar items
+            const sidebarItems = document.querySelectorAll('.sidebar-item');
+            sidebarItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    sidebarItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+
